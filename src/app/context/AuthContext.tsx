@@ -23,6 +23,7 @@ interface User {
 interface State {
   loading: boolean;
   error: string | null;
+  isFetchingUser: boolean;
   data: User | null;
 }
 
@@ -34,6 +35,7 @@ export const AuthenticationContext = createContext<AuthState>({
   loading: false,
   data: null,
   error: null,
+  isFetchingUser: true,
   setAuthState: () => {},
 });
 
@@ -41,25 +43,18 @@ export default function AuthContext({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<State>({
     loading: false,
     data: null,
+    isFetchingUser: true,
     error: null,
   });
 
   const fetchUser = async () => {
-    setAuthState({
-      data: null,
-      error: null,
-      loading: true,
-    });
+    setAuthState((prev) => ({ ...prev, isFetchingUser: true }));
 
     try {
       const jwt = getCookie("jwt");
 
       if (!jwt) {
-        setAuthState({
-          data: null,
-          error: null,
-          loading: false,
-        });
+        setAuthState((prev) => ({ ...prev, isFetchingUser: false, data: null }));
       } else {
         const response = await axios.get("http://localhost:3000/api/auth/me", {
           headers: {
@@ -67,23 +62,19 @@ export default function AuthContext({ children }: { children: ReactNode }) {
           },
         });
 
-        console.log(response)
+        console.log(response);
 
-        axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`
+        axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
 
-        setAuthState({
-          data: response.data,
-          error: null,
-          loading: false,
-        });
+        setAuthState((prev) => ({
+          ...prev,
+          isFetchingUser: false,
+          data: response?.data,
+        }));
       }
     } catch (error: any) {
       console.log(error);
-      setAuthState({
-        data: null,
-        error: error.response.data.errorMessage,
-        loading: false,
-      });
+      setAuthState((prev) => ({ ...prev, isFetchingUser: false, data: null }));
     }
   };
 

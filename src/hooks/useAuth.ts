@@ -20,36 +20,41 @@ const useAuth = () => {
   const { loading, data, error, setAuthState } = useAuthContext();
 
   const signin = async (data: SignInData) => {
-    setAuthState({
-      data: null,
-      error: null,
+    setAuthState((prev) => ({
+      ...prev,
       loading: true,
-    });
+      error: null,
+      data: null,
+    }));
     try {
       const res = await axios.post("http://localhost:3000/api/auth/signin", {
         email: data.email,
         password: data.password,
       });
-      setAuthState({
-        data: res.data,
-        error: null,
-        loading: false,
-      });
+     setAuthState((prev) => ({
+       ...prev,
+       loading: false,
+       error: null,
+       data: res?.data
+     }));
     } catch (error: any) {
       console.log(error);
-      setAuthState({
-        data: null,
-        error: error.response.data.errorMessage,
-        loading: false,
-      });
+     setAuthState((prev) => ({
+       ...prev,
+       loading: false,
+       error: error?.response?.data?.message,
+       data: null,
+     }));
     }
   };
+
   const signup = async (data: SignUpData) => {
-    setAuthState({
-      data: null,
-      error: null,
-      loading: true,
-    });
+     setAuthState((prev) => ({
+       ...prev,
+       loading: true,
+       error: null,
+       data: null,
+     }));
     try {
       const res = await axios.post("http://localhost:3000/api/auth/signup", {
         firstName: data.firstName,
@@ -59,28 +64,31 @@ const useAuth = () => {
         phoneNumber: data.phoneNumber,
         password: data.password,
       });
-      setAuthState({
-        data: res.data,
-        error: null,
+      setAuthState((prev) => ({
+        ...prev,
         loading: false,
-      });
+        error: null,
+        data:  res?.data
+      }));
     } catch (error: any) {
       console.log(error);
-      setAuthState({
-        data: null,
-        error: error.response.data.errorMessage,
+      setAuthState((prev) => ({
+        ...prev,
         loading: false,
-      });
+        error: error?.response?.data?.message,
+        data: null,
+      }));
     }
   };
 
   const logout = () => {
     deleteCookie('jwt')
-    setAuthState({
-      data: null,
-      error: null,
+    setAuthState((prev) => ({
+      ...prev,
       loading: false,
-    });
+      error: null,
+      data: null,
+    }));
   }
 
   return {

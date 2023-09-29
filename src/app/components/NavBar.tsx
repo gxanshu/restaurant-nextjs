@@ -6,7 +6,7 @@ import useAuthContext from "@/hooks/useAuthContext";
 import useAuth from "@/hooks/useAuth";
 
 export default function NavBar() {
-  const { data, loading } = useAuthContext();
+  const { data, isFetchingUser } = useAuthContext();
   const { logout } = useAuth();
   return (
     <nav className="bg-white p-2 flex justify-between">
@@ -14,7 +14,7 @@ export default function NavBar() {
         OpenTable
       </Link>
       <div>
-        {loading ? null : (
+        {isFetchingUser ? null : (
           <div className="flex">
             {data ? (
               <button
